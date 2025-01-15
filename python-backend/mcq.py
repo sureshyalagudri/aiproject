@@ -8,22 +8,18 @@ from typing import List, Optional
 router = APIRouter()
 client = getOpenAIClient()
 
-class Option(BaseModel):
-    OptionIndex: int = Field(..., description="The index of the option (0-based).")
-    OptionValue: str = Field(..., description="The text of the answer option.")
 
-class QuestionModel(BaseModel):
-    Id: str = Field(..., description="Unique identifier for the question (e.g., Q1, Q2, etc.).")
-    Question: str = Field(..., description="The text of the multiple-choice question.")
-    Options: List[Option] = Field(..., description="An array of possible answer options.")
-    CorrectOptionIndex: int = Field(..., description="The index of the correct answer option (0-based).")
-    Complexity: str = Field(..., description="The complexity level of the question.", enum=["Basic", "Intermediate", "Advanced"])
+# class Option(BaseModel):
+   # Use this for Challenge 2
 
+# class QuestionModel(BaseModel):
+    # Use this for Challenge 2
 
 class GenerateQuestionRequest(BaseModel):
     topic: str
     complexity: str  # Add complexity field
     messages: Optional[List[dict]] = None
+
 
 @router.post("/mcq/generate")
 async def generate_mcq(request: GenerateQuestionRequest):
@@ -46,53 +42,13 @@ async def generate_mcq(request: GenerateQuestionRequest):
     prompt = f"Create {request.topic} Multiple choice interview question with complexity level: {request.complexity}."
     user_message = {"role": "user", "content": [{"type": "text", "text": prompt}]}
     messages.append(user_message)
-    
+
     question_schema = {
-        "type": "object",
-        "properties": {
-            "Id": {
-                "type": "string",
-                "description": "Unique identifier for the question (e.g., Q1, Q2, etc.).",
-            },
-            "Question": {
-                "type": "string",
-                "description": "The text of the multiple-choice question.",
-            },
-            "Options": {
-                "type": "array",
-                "description": "An array of possible answer options.",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "OptionIndex": {
-                            "type": "integer",
-                            "description": "The index of the option (0-based).",
-                        },
-                        "OptionValue": {
-                            "type": "string",
-                            "description": "The text of the answer option.",
-                        },
-                    },
-                    "required": ["OptionIndex", "OptionValue"],
-                    "additionalProperties": False,
-                },
-            },
-            "CorrectOptionIndex": {
-                "type": "integer",
-                "description": "The index of the correct answer option (0-based).",
-            },
-            "Complexity": {
-                "type": "string",
-                "enum": ["Basic", "Intermediate", "Advanced"],
-                "description": "The complexity level of the question.",
-            },
-        },
-        "required": ["Id", "Question", "Options", "CorrectOptionIndex", "Complexity"],
-        "additionalProperties": False,
+        # Challenge1: Write the Schema for the multiple choice question as given in specification
     }
 
     response = client.chat.completions.create(
-        model="gpt-4o-2024-05-13",
+        model="gpt-4o-2024-08-06",
         temperature=0.5,
         response_format={
             "type": "json_schema",

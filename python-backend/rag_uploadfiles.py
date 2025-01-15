@@ -81,8 +81,8 @@ async def get_files():
         # Connect to OpenSearch
         client = OpenSearch(**OPENSEARCH_CONFIG)
         search_results = retrieve_all_documents(client)
-        # Challenge2: Get hits
-        hits = 
+        # Challenge2: Get hits (replace "" with relevant code) Note: Debug and find the object structure from search results.
+        hits = ""
         # To get only distinct files
         sources = []  # List to hold file names
         for hit in hits:
