@@ -27,7 +27,7 @@ async def chat(request: ChatRequest):
         )
 
         assistant_message = response.choices[0].message.content
-        messages.append({"role": "system", "content": assistant_message})
+        messages.append({"role": "assistant", "content": assistant_message})
 
         return JSONResponse(content={"messages": messages})
 

@@ -5,6 +5,7 @@ import io
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
+import uuid
 import tempfile
 from dotenv import load_dotenv
 from opensearchpy import OpenSearch
@@ -49,7 +50,7 @@ def insert_documents(search_client, fileChunks, embeddings, fileMetadata):
         # Create an document object   
         document = {
             "_index": INDEX_NAME,
-            "_id": i,
+            "_id": str(uuid.uuid4()),  # Generate a unique GUID for the document ID
             "_source": {
                 "name":  os.path.basename(item["source"]),  # Document source name without absolute path
                 "content": fileChunks[i],  # Document content
@@ -65,11 +66,10 @@ def insert_documents(search_client, fileChunks, embeddings, fileMetadata):
 
 #Challenge 1: Implement the retrieve_all_documents function to retrieve all documents from OpenSearch index files.
 def retrieve_all_documents(client):
-    # Perform the OpenSearch search to get documents
+    # Perform the OpenSearch search to get ALL documents
+    # query should as here: "query": {"match_all": {}},
     search_body = {
-        "size": 1000,  # Get more results initially
-        "_source": ["name", "content", "embedding"],  # Only retrieve necessary fields
-        "query": {"match_all": {}},  # We'll filter based on cosine similarity in Python
+        
     }
     response = client.search(index=INDEX_NAME, body=search_body)
     return response
@@ -81,8 +81,8 @@ async def get_files():
         # Connect to OpenSearch
         client = OpenSearch(**OPENSEARCH_CONFIG)
         search_results = retrieve_all_documents(client)
-        # get hits
-        hits = search_results["hits"]["hits"]
+        # Challenge2: Get hits
+        hits = 
         # To get only distinct files
         sources = []  # List to hold file names
         for hit in hits:

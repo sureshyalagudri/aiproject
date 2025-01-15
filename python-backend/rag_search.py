@@ -17,7 +17,7 @@ password = os.environ.get("OPENSEARCH_PASSWORD")
 
 # OpenSearch configuration
 OPENSEARCH_CONFIG = {
-    #Challenge: Set the OpenSearch configuration parameters including host, port, username, and password
+    #Challenge 1: Set the OpenSearch configuration parameters including host, port, username, and password
 }
 
 INDEX_NAME = "files"
@@ -36,7 +36,7 @@ async def search(request: searchRequest):
         query_embedding = generate_embeddings([query])[0]  # Get the first element of the list
         search_client = OpenSearch(**OPENSEARCH_CONFIG)
         search_body = {
-            #Challenge: frame the query to retrieve 3 documents with embeddings similar to the query embedding
+            #Challenge 2: frame the query to retrieve 3 documents with embeddings similar to the query embedding
         }
 
         # Search for similar documents based on the query embedding
@@ -46,13 +46,13 @@ async def search(request: searchRequest):
         documents_string = ""
         # Note: Match_all query returns all documents, so we need to filter based on cosine similarity
         
-        # Challenge: Frame the prompt to include the query and the context in documents_string
+        # Challenge 3: Frame the prompt to include the query and the context in documents_string
         prompt = f"""
 
         """
 
         # Call OpenAI API
-        response = "" #Challenge: Call the OpenAI API to get the response for the prompt
+        response = "" #Challenge 4: Call the OpenAI API to get the response for the prompt
 
         response_str = response.choices[0].message.content
         return JSONResponse(content={"response": response_str})
