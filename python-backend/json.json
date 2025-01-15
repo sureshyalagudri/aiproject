@@ -1,0 +1,24 @@
+{
+    "Id": "Q1",
+    "Question": "What is the capital of France?",
+    "Options": [
+        {
+            "OptionIndex": 0,
+            "OptionValue": "Berlin"
+        },
+        {
+            "OptionIndex": 1,
+            "OptionValue": "Madrid"
+        },
+        {
+            "OptionIndex": 2,
+            "OptionValue": "Paris"
+        },
+        {
+            "OptionIndex": 3,
+            "OptionValue": "Rome"
+        }
+    ],
+    "CorrectOptionIndex": 2,
+    "Complexity": "Basic"
+}

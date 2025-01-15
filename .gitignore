@@ -1,0 +1,29 @@
+# Node modules
+react-app/node_modules/
+
+# Build directories
+react-app/build/
+
+# Environment variables
+.env
+.env.local
+LangchainExamples/.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VSCode settings
+.vscode/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python virtual environments
+.venv
+.env
+venv
