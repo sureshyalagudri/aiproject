@@ -1,10 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from util import getOpenAIClient
 from pydantic import BaseModel
+from openai import OpenAI
+from util import generateToken
 
+generateToken()
+client = OpenAI()
 router = APIRouter()
-client = getOpenAIClient()
+
 
 class ChatRequest(BaseModel):
     query: str
