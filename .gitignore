@@ -1,13 +1,14 @@
 # Node modules
 react-app/node_modules/
+nodejs-backend/node_modules/
+nodejs-backend/.env
 
 # Build directories
 react-app/build/
 
 # Environment variables
 .env
-.env.local
-LangchainExamples/.env
+**/*.env
 
 # Python cache
 __pycache__/
@@ -27,3 +28,4 @@ Thumbs.db
 .venv
 .env
 venv
+
