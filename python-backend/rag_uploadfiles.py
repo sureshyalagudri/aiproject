@@ -10,10 +10,12 @@ import tempfile
 from dotenv import load_dotenv
 from opensearchpy import OpenSearch
 from opensearchpy.helpers import bulk
-from util import getOpenAIClient
+from openai import OpenAI
+from util import generateToken
+
+generateToken()
 
 router = APIRouter()
-load_dotenv()
 
 host = os.environ.get("OPENSEARCH_HOST")
 port = os.environ.get("OPENSEARCH_PORT")
@@ -34,7 +36,7 @@ OPENSEARCH_CONFIG = {
 INDEX_NAME = "files"
 
 def generate_embeddings(texts):
-    client = getOpenAIClient()  # Get the OpenAI client
+    client = OpenAI()  # Get the OpenAI client
     # Generate embeddings using OpenAI API
     response = client.embeddings.create(
         input=texts, dimensions=256, model="text-embedding-3-large"
