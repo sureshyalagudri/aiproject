@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 import json
-from util import getOpenAIClient
+from openai import OpenAI
+from util import generateToken
 
+generateToken()
 router = APIRouter()
 
 @router.get("/ask-question")
@@ -10,7 +12,7 @@ async def generate_question(topic: str):
     # Challenge 1.a - Write the prompt
     prompt = f""
 
-    client = getOpenAIClient()
+    client = OpenAI()
     # Challenge 1.b - Call OpenAI API to generate questions
     response = {}
    
@@ -34,7 +36,7 @@ async def submit_descriptive_questions(request: Request):
                       """
 
     # OpenAI Call to generate feedback
-    client = getOpenAIClient()
+    client = OpenAI()()
     #Challenge 2.b - Call the OpenAI API and get the resopnse
     response = {}
 
