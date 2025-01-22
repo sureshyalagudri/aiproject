@@ -2,6 +2,7 @@
 react-app/node_modules/
 nodejs-backend/node_modules/
 nodejs-backend/.env
+nodejs-backend-solved/node_modules
 
 # Build directories
 react-app/build/

@@ -1,61 +1,78 @@
-import axios from 'axios';
-import dotenv from "dotenv";
-import { promises as fs } from 'fs';
+const axios = require('axios');
+const fs = require('fs');
+const dotenv = require('dotenv');
+const { DateTime } = require('luxon');
+const {OpenAI} = require('openai');
 
-export async function generateToken() {
-    try {
-        dotenv.config();
-        const tokenUrl = process.env.TOKEN_URL;
-        const clientId = process.env.CLIENT_ID;
-        const clientSecret = process.env.CLIENT_SECRET;
-        const scope = process.env.SCOPE;
-        const timeGeneratedStr = process.env.TIME_GENERATED;
-        var timeGenerated = new Date(timeGeneratedStr);
-        const currentTime = new Date();
+dotenv.config();
 
-        // Check if the token is older than 60 minutes
-        if (timeGenerated.getTime() + 60 * 60 * 1000 > currentTime.getTime())
-            return;
+async function getToken() {
+    // Load environment variables
+    const tokenUrl = process.env.TOKEN_URL;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+    const scope = process.env.SCOPE;
 
-        // Define the payload
-        const payload = new URLSearchParams({
-            grant_type: 'client_credentials',
-            client_id: clientId,
-            client_secret: clientSecret,
-            scope: scope,
-        });
+    // Define the payload
+    const payload = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+        scope: scope
+    });
 
-        // Make the POST request
-        const response = await axios.post(tokenUrl, payload.toString(), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
+    // Make the POST request
+    const response = await axios.post(tokenUrl, payload, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
 
-        const token = response.data.access_token;
-        timeGenerated = new Date().toISOString();
+    const token = response.data.access_token;
+    const timeGenerated = DateTime.now().toISO();
 
-        // Read the current .env file
-        const envData = await fs.readFile('.env', 'utf8');
-        const envLines = envData.split('\n');
+    // Update the .env file with the new token
+    const envFilePath = '.env';
+    const envFileContent = fs.readFileSync(envFilePath, 'utf8');
+    const envFileLines = envFileContent.split('\n');
+    const updatedEnvFileLines = envFileLines.map(line => {
+        if (line.startsWith('OPENAI_API_KEY=')) {
+            return `OPENAI_API_KEY=${token}`;
+        } else if (line.startsWith('TIME_GENERATED=')) {
+            return `TIME_GENERATED=${timeGenerated}`;
+        } else {
+            return line;
+        }
+    });
 
-        // Update the OPENAI_API_KEY and TIME_GENERATED in the .env file
-        const updatedEnv = envLines.map((line) => {
-            if (line.startsWith('OPENAI_API_KEY=')) {
-                return `OPENAI_API_KEY=${token}`;
-            } else if (line.startsWith('TIME_GENERATED=')) {
-                return `TIME_GENERATED=${timeGenerated}`;
-            } else {
-                return line;
-            }
-        });
-        // Write the updated .env file
-        await fs.writeFile('.env', updatedEnv.join('\n'), 'utf8');
-        // Reload environment variables
-        dotenv.config();
-        return token
-    } catch (error) {
-        console.error('Error getting token:', error.response ? error.response.data : error.message);
-        throw error;
-    }
+    fs.writeFileSync(envFilePath, updatedEnvFileLines.join('\n'));
+
+    return token;
 }
+
+let timeGenerated = DateTime.now().toISO();
+//let token = getToken();
+
+async function getOpenAIClient() {
+    // Load environment variables from .env file
+    dotenv.config();
+    const client = new OpenAI({
+        baseUrl: process.env.DEERE_AI_GATEWAY
+    });
+
+    //return client;
+
+    const timeGeneratedStr = process.env.TIME_GENERATED;
+    timeGenerated = DateTime.fromISO(timeGeneratedStr);
+    if (timeGenerated.plus({ minutes: 60 }) < DateTime.now()) {
+        token = await getToken();
+    } else {
+        token = process.env.OPENAI_API_KEY;
+    }
+    client.apiKey = token;
+    client.baseUrl = process.env.DEERE_AI_GATEWAY;
+    return client;
+}
+
+module.exports = {
+    getOpenAIClient,
+    getToken
+};

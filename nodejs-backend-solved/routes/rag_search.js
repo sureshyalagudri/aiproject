@@ -4,7 +4,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { getOpenAIClient } = require('../util');
+const { generateToken } = require('../util');
 const { v4: uuidv4 } = require('uuid');
 const {generate_embeddings} = require('./rag_uploadfiles')
 const { Client: OpenSearchClient } = require('@opensearch-project/opensearch');
@@ -15,11 +15,22 @@ const { OpenSearchVectorStore } = require("@langchain/community/vectorstores/ope
 
 
 require('dotenv').config();
+(async () => {
+  await generateToken();
+})();
+
 
 const INDEX_NAME = 'files';
 
 const OPENSEARCH_CONFIG = {
-  // #Challenge 1: Set the OpenSearch configuration parameters including host, port, username, and password
+  node: `https://${process.env.OPENSEARCH_HOST}:${process.env.OPENSEARCH_PORT}`,
+  auth: {
+    username: process.env.OPENSEARCH_USERNAME,
+    password: process.env.OPENSEARCH_PASSWORD,
+  },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 const opensearchClient = new OpenSearchClient(OPENSEARCH_CONFIG);
@@ -34,16 +45,10 @@ router.post('/search', async (req, res) => {
   });
   
   /* Search the vector DB independently with meta filters */
-  //Challenge 2: frame the query to retrieve 3 documents with embeddings similar to the query embedding
-  const results = [];
-  //Challenge 3: Frame the prompt to include the query and the context in documents_string
-  const client = await getOpenAIClient();
-  const prompt = '';
-  //Challenge 4: Call the OpenAI API to get the search results
-  const response = {};
-  const response_str = response.choices[0].message.content;
+  const results = await vectorStore.similaritySearch(searchQuery, 1, dimensions=256, {  });
+  const client = new OpenAI();
 
-  res.send({ response: response_str });
+  res.send({ message: `Search results for: ${searchQuery}` });
 });
 
 module.exports = router;

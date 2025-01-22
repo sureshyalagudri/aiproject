@@ -1,9 +1,6 @@
-import express from 'express';
-import { generateToken } from '../util.js';
-import { OpenAI  } from 'openai';
-
+const express = require('express');
 const router = express.Router();
-await generateToken();
+const { getOpenAIClient } = require('../util');
 
 // Endpoint to generate descriptive questions
 router.get('/generate-questions', async (req, res) => {
@@ -12,7 +9,7 @@ router.get('/generate-questions', async (req, res) => {
   // Challenge 1.a - Write a prompt as in requirement document. Use {topic} variable to include the topic in the prompt
   const prompt = ''
 
-  const client = await OpenAI();
+  const client = await getOpenAIClient();
   // Challenge 1.b - Call OpenAI API to generate questions using prompt variable
   const response = {}
 
@@ -37,7 +34,7 @@ router.post('/submitdescriptivequestions', async (req, res) => {
   // Challenge 2.a - Write prompt to evaluate the question and answer
   const prompt = '';
 
-  const client = await OpenAI();
+  const client = await getOpenAIClient();
   // Challenge 2.b - Call the OpenAI API and get the response
   const feedback_response = {}
 
@@ -48,4 +45,4 @@ router.post('/submitdescriptivequestions', async (req, res) => {
   res.json({ feedback: feedback_text });
 });
 
-export default router;
+module.exports = router;

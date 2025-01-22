@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getOpenAIClient } = require('../util');
+const { generateToken } = require('../util');
+const { OpenAI } = require('openai');
+
+(async () => {
+  await generateToken();
+})();
+
 
 // Endpoint to generate MCQ questions
 router.post('/mcq/generate', async (req, res) => {
@@ -23,12 +29,32 @@ router.post('/mcq/generate', async (req, res) => {
 
   const finalMessages = messages ? messages.concat(userMessage) : defaultMessages.concat(userMessage);
 
-  //challenge 1 - create a schema for the multiple choice question
   const questionSchema = {
-   
+    type: "object",
+    properties: {
+      Id: { type: "string", description: "Unique identifier for the question (e.g., Q1, Q2, etc.)." },
+      Question: { type: "string", description: "The text of the multiple-choice question." },
+      Options: {
+        type: "array",
+        description: "An array of possible answer options.",
+        items: {
+          type: "object",
+          properties: {
+            OptionIndex: { type: "integer", description: "The index of the option (0-based)." },
+            OptionValue: { type: "string", description: "The text of the answer option." }
+          },
+          required: ["OptionIndex", "OptionValue"],
+          additionalProperties: false
+        }
+      },
+      CorrectOptionIndex: { type: "integer", description: "The index of the correct answer option (0-based)." },
+      Complexity: { type: "string", enum: ["Basic", "Intermediate", "Advanced"], description: "The complexity level of the question." }
+    },
+    required: ["Id", "Question", "Options", "CorrectOptionIndex", "Complexity"],
+    additionalProperties: false
   };
 
-  const client = await getOpenAIClient();
+  const client = await new OpenAI();
   const response = await client.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     temperature: 0.5,
@@ -56,10 +82,12 @@ router.post('/mcq/submit', async (req, res) => {
   const data = req.body;
   const userMessage = JSON.stringify(data);
 
-  //challenge 2 - Write prompt to evaluate the question and answer
-  const prompt = ``;
+  const prompt = `Evaluate the following candidate's answers to multiple-choice questions and provide: \n\n` +
+    `* An overall rating out of 10. \n` +
+    `* Specific feedback on each answer, highlighting strengths and weaknesses \n` +
+    `JSON Data: ${userMessage}`;
 
-  const client = await getOpenAIClient();
+  const client = new OpenAI();
   const feedbackResponse = await client.chat.completions.create({
     model: "gpt-4o",
     temperature: 0.2,
