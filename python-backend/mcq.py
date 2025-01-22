@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from util import getOpenAIClient
+from openai import OpenAI
+from util import generateToken
 import json
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
 router = APIRouter()
-client = getOpenAIClient()
+client = OpenAI()
 
 
 # class Option(BaseModel):
