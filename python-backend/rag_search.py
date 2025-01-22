@@ -1,11 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from util import getOpenAIClient
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from opensearchpy import OpenSearch
 from rag_uploadfiles import generate_embeddings
+from openai import OpenAI
+from util import generateToken
+
+generateToken()
 
 router = APIRouter()
 load_dotenv()
