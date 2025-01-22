@@ -1,6 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { generateToken } from '../util.js';
+import { OpenAI  } from 'openai';
+
 const router = express.Router();
-const { getOpenAIClient } = require('../util');
+await generateToken();
 
 // Endpoint to generate MCQ questions
 router.post('/mcq/generate', async (req, res) => {
@@ -28,7 +31,7 @@ router.post('/mcq/generate', async (req, res) => {
    
   };
 
-  const client = await getOpenAIClient();
+  const client = await OpenAI();
   const response = await client.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     temperature: 0.5,
@@ -59,7 +62,7 @@ router.post('/mcq/submit', async (req, res) => {
   //challenge 2 - Write prompt to evaluate the question and answer
   const prompt = ``;
 
-  const client = await getOpenAIClient();
+  const client = await OpenAI();
   const feedbackResponse = await client.chat.completions.create({
     model: "gpt-4o",
     temperature: 0.2,
@@ -82,4 +85,4 @@ router.post('/mcq/submit', async (req, res) => {
   res.json({ feedback: feedbackText });
 });
 
-module.exports = router;
+export default router;

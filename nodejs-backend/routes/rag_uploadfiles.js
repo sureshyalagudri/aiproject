@@ -1,16 +1,18 @@
-const express = require('express');
-const router = express.Router();
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { Readable } = require('stream');
-const { Client: OpenSearchClient } = require('@opensearch-project/opensearch');
-const { getOpenAIClient } = require('../util');
-const { PDFLoader } = require("@langchain/community/document_loaders/fs/pdf");
-const { v4: uuidv4 } = require('uuid');
+import express from 'express';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { Readable } from 'stream';
+import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
+import { generateToken } from '../util.js';
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from "dotenv";
 
-require('dotenv').config();
+dotenv.config();
+const router = express.Router();
+await generateToken();
 
 const upload = multer();
 const INDEX_NAME = 'files';
@@ -26,8 +28,8 @@ const OPENSEARCH_CONFIG = {
   },
 };
 
-async function generate_embeddings(texts) {
-  const client = await getOpenAIClient();
+export async function generate_embeddings(texts) {
+  const client = await OpenAI();
   const response = await client.embeddings.create({
     input: texts,
     model: 'text-embedding-3-large',
@@ -125,5 +127,4 @@ router.post('/rag/upload', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-module.exports = router;
+export default router;

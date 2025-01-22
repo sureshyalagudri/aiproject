@@ -1,6 +1,9 @@
-const express = require('express');
+import express from 'express';
+import { generateToken } from '../util.js';
+import { OpenAI  } from 'openai';
+
 const router = express.Router();
-const { getOpenAIClient } = require('../util');
+await generateToken();
 
 // Endpoint for chat
 router.post('/chat', async (req, res) => {
@@ -11,7 +14,7 @@ router.post('/chat', async (req, res) => {
   }
 
   try {
-    const client = await getOpenAIClient();
+    const client = await OpenAI();
     // Call OpenAI API
     const response = await client.chat.completions.create({
       model: "gpt-4o-2024-05-13",
@@ -28,4 +31,4 @@ router.post('/chat', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

@@ -1,18 +1,19 @@
-const express = require('express');
-const router = express.Router();
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { getOpenAIClient } = require('../util');
-const { v4: uuidv4 } = require('uuid');
-const {generate_embeddings} = require('./rag_uploadfiles')
-const { Client: OpenSearchClient } = require('@opensearch-project/opensearch');
-const { OpenAI } = require("@langchain/openai");
-const { Document } = require("langchain/document");
-const { OpenAIEmbeddings } = require("@langchain/openai");
-const { OpenSearchVectorStore } = require("@langchain/community/vectorstores/opensearch");
+import express from 'express';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { generateToken } from '../util.js';
+import { v4 as uuidv4 } from 'uuid';
+import { generate_embeddings } from './rag_uploadfiles.js';
+import { Client as OpenSearchClient } from '@opensearch-project/opensearch';
+import { OpenAI } from "@langchain/openai";
+import { Document } from "langchain/document";
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { OpenSearchVectorStore } from "@langchain/community/vectorstores/opensearch";
 
+const router = express.Router();
+await generateToken();
 
 require('dotenv').config();
 
@@ -37,7 +38,7 @@ router.post('/search', async (req, res) => {
   //Challenge 2: frame the query to retrieve 3 documents with embeddings similar to the query embedding
   const results = [];
   //Challenge 3: Frame the prompt to include the query and the context in documents_string
-  const client = await getOpenAIClient();
+  const client = await OpenAI();
   const prompt = '';
   //Challenge 4: Call the OpenAI API to get the search results
   const response = {};
@@ -46,4 +47,4 @@ router.post('/search', async (req, res) => {
   res.send({ response: response_str });
 });
 
-module.exports = router;
+export default router;
