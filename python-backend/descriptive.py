@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from util import getOpenAIClient
 import json
 import re
+from openai import OpenAI
+from util import generateToken
 
 router = APIRouter()
+generateToken()
+client = OpenAI()
 
-client = getOpenAIClient()
 @router.get("/generate-questions")
 async def generate_questions(topic: str):
     # Challenge 1.a - Write a prompt as in requirement document. Use {topic} variable to include the topic in the prompt
