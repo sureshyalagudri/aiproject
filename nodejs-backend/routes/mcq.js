@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getOpenAIClient } = require('../util');
+const { generateToken } = require('../util');
+const { OpenAI } = require('openai');
+
+(async () => {
+  await generateToken();
+})();
+
 
 // Endpoint to generate MCQ questions
 router.post('/mcq/generate', async (req, res) => {
@@ -23,12 +29,17 @@ router.post('/mcq/generate', async (req, res) => {
 
   const finalMessages = messages ? messages.concat(userMessage) : defaultMessages.concat(userMessage);
 
-  //challenge 1 - create a schema for the multiple choice question
   const questionSchema = {
-   
+    // Challenge1: Write the Schema for the multiple choice question as given in specification
   };
 
-  const client = await getOpenAIClient();
+  const header_name = process.env.GATEWAY_HEADER_NAME
+  const header_value = process.env.GATEWAY_HEADER_VALUE
+  const headers = {
+    header_name: header_value,
+  };
+  const client = new OpenAI(headers);
+
   const response = await client.chat.completions.create({
     model: "gpt-4o-2024-08-06",
     temperature: 0.5,
@@ -55,11 +66,10 @@ router.post('/mcq/generate', async (req, res) => {
 router.post('/mcq/submit', async (req, res) => {
   const data = req.body;
   const userMessage = JSON.stringify(data);
-
-  //challenge 2 - Write prompt to evaluate the question and answer
+  // Challenge2: Evaluate the candidate's answers to multiple-choice questions
   const prompt = ``;
 
-  const client = await getOpenAIClient();
+  const client = new OpenAI();
   const feedbackResponse = await client.chat.completions.create({
     model: "gpt-4o",
     temperature: 0.2,

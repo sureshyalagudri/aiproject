@@ -6,11 +6,17 @@ const path = require('path');
 const os = require('os');
 const { Readable } = require('stream');
 const { Client: OpenSearchClient } = require('@opensearch-project/opensearch');
-const { getOpenAIClient } = require('../util');
+const { generateToken } = require('../util');
 const { PDFLoader } = require("@langchain/community/document_loaders/fs/pdf");
 const { v4: uuidv4 } = require('uuid');
+const { OpenAI } = require('openai');
+
 
 require('dotenv').config();
+(async () => {
+  await generateToken();
+})();
+
 
 const upload = multer();
 const INDEX_NAME = 'files';
@@ -26,8 +32,8 @@ const OPENSEARCH_CONFIG = {
   },
 };
 
-async function generate_embeddings(texts) {
-  const client = await getOpenAIClient();
+ async function generate_embeddings(texts) {
+  const client = new OpenAI();
   const response = await client.embeddings.create({
     input: texts,
     model: 'text-embedding-3-large',
@@ -38,18 +44,12 @@ async function generate_embeddings(texts) {
 
 async function insert_documents(search_client, fileChunks, embeddings, fileMetadata) {
   const documents = fileChunks.map((content, i) => ({
-    index: {
-      _index: INDEX_NAME,
-      _id: uuidv4(),
-      _source: {
-        name: path.basename(fileMetadata[i].source),
-        content,
-        embedding: embeddings[i],
-      },
-    },
+    name: path.basename(fileMetadata[i].source),
+    content,
+    embedding: embeddings[i],
+    
   }));
   const { body: success } = await search_client.helpers.bulk({
-    index: INDEX_NAME, // the default index
     datasource: documents,
     onDocument (doc) {
       return {
@@ -63,7 +63,7 @@ async function insert_documents(search_client, fileChunks, embeddings, fileMetad
 //Challenge 1: Implement the retrieve_all_documents function to retrieve all documents from OpenSearch index files.
 async function retrieve_all_documents(client) {
   const search_body = {
-    
+   
   };
   const { body: response } = await client.search({ index: INDEX_NAME, body: search_body });
   return response;
@@ -76,8 +76,7 @@ router.get('/rag/files', async (req, res) => {
     });
 
     const search_results = await retrieve_all_documents(client);
-    //Challenge2: Get hits (replace "" with relevant code) Note: Debug and find the object structure from search results.
-    const sources = [];
+    const sources = [...new Set(search_results.hits.hits.map(hit =>hit._source.name))];
     res.json({ sources });
   } catch (e) {
     res.status(500).json({ error: e.message });

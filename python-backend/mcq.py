@@ -5,10 +5,15 @@ from util import generateToken
 import json
 from pydantic import BaseModel, Field
 from typing import List, Optional
+import os
 
 router = APIRouter()
-client = OpenAI()
-
+header_name = os.getenv('GATEWAY_HEADER_NAME')
+header_value = os.getenv('GATEWAY_HEADER_VALUE')
+headers = {
+    header_name: header_value
+ }
+client = OpenAI(default_headers=headers)
 
 # class Option(BaseModel):
    # Use this for Challenge 2

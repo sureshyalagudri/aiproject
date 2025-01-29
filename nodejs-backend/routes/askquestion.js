@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getOpenAIClient } = require('../util');
+const { generateToken } = require('../util');
+const { OpenAI } = require('openai');
+
+(async () => {
+  await generateToken();
+})();
 
 // Endpoint to generate a question
 router.get('/ask-question', async (req, res) => {
@@ -9,11 +14,15 @@ router.get('/ask-question', async (req, res) => {
   // Challenge 1.a - Write the prompt
   const prompt = ``;
 
-  const client = await getOpenAIClient();
-  // Challenge 1.b - Call OpenAI API to generate questions
-  const response = {
+  const header_name = process.env.GATEWAY_HEADER_NAME
+  const header_value = process.env.GATEWAY_HEADER_VALUE
+  const headers = {
+    header_name: header_value,
+  };
+  const client = new OpenAI(headers);
 
-  }
+  // Challenge 1.b - Call OpenAI API to generate questions
+  const response = {}
 
   // Extract the generated text
   const questions_text = response.choices[0].message.content;
@@ -32,12 +41,17 @@ router.post('/question-feedback', async (req, res) => {
   const prompt = ``;
 
   // OpenAI Call to generate feedback
-  const client = await getOpenAIClient();
+  const header_name = process.env.GATEWAY_HEADER_NAME
+  const header_value = process.env.GATEWAY_HEADER_VALUE
+  const headers = {
+    header_name: header_value,
+  };
+  const client = new OpenAI(headers);
+
   // Challenge 2.b - Call the OpenAI API and get the response
   const response = {
-    
-  }
 
+  }
   // Extract the generated text
   const feedback_text = response.choices[0].message.content;
 

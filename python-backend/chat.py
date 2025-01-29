@@ -3,9 +3,16 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from openai import OpenAI
 from util import generateToken
+import os
 
 generateToken()
-client = OpenAI()
+header_name = os.getenv('GATEWAY_HEADER_NAME')
+header_value = os.getenv('GATEWAY_HEADER_VALUE')
+headers = {
+    header_name: header_value
+ }
+client = OpenAI(default_headers=headers)
+
 router = APIRouter()
 
 

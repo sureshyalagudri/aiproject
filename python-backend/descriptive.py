@@ -3,11 +3,18 @@ from fastapi.responses import JSONResponse
 import json
 import re
 from openai import OpenAI
+import os
 from util import generateToken
 
 router = APIRouter()
 generateToken()
-client = OpenAI()
+header_name = os.getenv('GATEWAY_HEADER_NAME')
+header_value = os.getenv('GATEWAY_HEADER_VALUE')
+headers = {
+    header_name: header_value
+ }
+client = OpenAI(default_headers=headers)
+
 
 @router.get("/generate-questions")
 async def generate_questions(topic: str):

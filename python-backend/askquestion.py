@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import json
 from openai import OpenAI
 from util import generateToken
+import os
 
 generateToken()
 router = APIRouter()
@@ -12,7 +13,13 @@ async def generate_question(topic: str):
     # Challenge 1.a - Write the prompt
     prompt = f""
 
-    client = OpenAI()
+    header_name = os.getenv('GATEWAY_HEADER_NAME')
+    header_value = os.getenv('GATEWAY_HEADER_VALUE')
+    headers = {
+        header_name: header_value
+    }
+    client = OpenAI(default_headers=headers)
+
     # Challenge 1.b - Call OpenAI API to generate questions
     response = {}
    
@@ -36,7 +43,13 @@ async def submit_descriptive_questions(request: Request):
                       """
 
     # OpenAI Call to generate feedback
-    client = OpenAI()()
+    header_name = os.getenv('GATEWAY_HEADER_NAME')
+    header_value = os.getenv('GATEWAY_HEADER_VALUE')
+    headers = {
+        header_name: header_value
+    }
+    client = OpenAI(default_headers=headers)
+
     #Challenge 2.b - Call the OpenAI API and get the resopnse
     response = {}
 
