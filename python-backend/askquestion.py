@@ -11,7 +11,7 @@ router = APIRouter()
 @router.get("/ask-question")
 async def generate_question(topic: str):
     # Challenge 1.a - Write the prompt
-    prompt = f""
+    prompt = f"Compose a challenging {topic} interview question without answer. \n Question:"
 
     header_name = os.getenv('GATEWAY_HEADER_NAME')
     header_value = os.getenv('GATEWAY_HEADER_VALUE')
@@ -21,8 +21,15 @@ async def generate_question(topic: str):
     client = OpenAI(default_headers=headers)
 
     # Challenge 1.b - Call OpenAI API to generate questions
-    response = {}
-   
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-05-13",
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": "You are an expert in technical interviews, generating relevant questions with concise (1-2 sentence) answers."},
+            {"role": "user", "content": prompt},
+        ],
+    )
+  
     # Extract the generated text
     questions_text = response.choices[0].message.content
 
