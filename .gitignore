@@ -15,9 +15,6 @@ react-app/build/
 __pycache__/
 *.pyc
 
-# VSCode settings
-.vscode/
-
 # Logs
 *.log
 
