@@ -1,0 +1,4 @@
+Prompt: Can you get me weather and news for following cities
+1. Mumbai
+2. Pune
+3. Hyderabad
