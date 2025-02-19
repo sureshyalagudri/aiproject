@@ -53,6 +53,7 @@ async def generate_mcq(request: GenerateQuestionRequest):
         # Challenge1: Write the Schema for the multiple choice question as given in specification
     }
 
+# Change the call to client.beta.chat.completions.parse for Pydantic classes.
     response = client.chat.completions.create(
         model="gpt-4o-2024-08-06",
         temperature=0.5,
@@ -67,6 +68,7 @@ async def generate_mcq(request: GenerateQuestionRequest):
         messages=messages,
     )
 
+# Don't change below lines if Pydantic is used.
     questions_text = response.choices[0].message.content
     questions = json.loads(questions_text)
     assistant_message = {
