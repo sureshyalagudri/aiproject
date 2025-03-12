@@ -10,9 +10,15 @@ router = APIRouter()
 
 @router.get("/ask-question")
 async def generate_question(topic: str):
+    print("Generating questions for topic: ", topic)
     # Challenge 1.a - Write the prompt
-    prompt = f""
-
+   # Challenge 1.a - Write the prompt
+    prompt = f"""
+    You are an expert in {topic}. You will provide an interview question.
+    Ensure that only one question is shown.
+    Ensure that the question is prefixed with "Question:".
+    Ensure that the returned question doesn't have an answer included.
+    """
     header_name = os.getenv('GATEWAY_HEADER_NAME')
     header_value = os.getenv('GATEWAY_HEADER_VALUE')
     headers = {
@@ -20,8 +26,12 @@ async def generate_question(topic: str):
     }
     client = OpenAI(default_headers=headers)
 
+    messages = [{"role": "user", "content": prompt}]
     # Challenge 1.b - Call OpenAI API to generate questions
-    response = {}
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-08-06",
+        messages=messages,
+    )
   
     # Extract the generated text
     questions_text = response.choices[0].message.content
