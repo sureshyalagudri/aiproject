@@ -19,16 +19,41 @@ client = OpenAI(default_headers=headers)
 @router.get("/generate-questions")
 async def generate_questions(topic: str):
     # Challenge 1.a - Write a prompt as in requirement document. Use {topic} variable to include the topic in the prompt
-    prompt = f""
+    prompt = f"""
+    You are an expert in {topic}. You will provide an interview question.
+    Ensure that only three question is shown.
+    Ensure that the returned question doesn't have an answer included.
+    """
+
+    systemPrompt = f"""
+    You are an expert in {topic}. 
+    Please use the below json format for output:
+    [
+        {{
+            "Id": 1,
+            "Question": "sample question",
+            "ExpectedAnswer": "sample answer" 
+        }}
+    ]
+    """
 
     # Challenge 1.b - Call OpenAI API to generate questions using prompt variable
-    response = {}
+    messages = [
+        {"role": "system", "content": systemPrompt},
+        {"role": "user", "content": prompt}
+        ]
+
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-05-13",
+        messages=messages,
+        temperature=0.2,
+    )
 
     # Extract the generated text and convert it to JSON
     questions_text = response.choices[0].message.content
 
     # Challenge 1.c - Remove extra characters from response if present
-    questions_json_str = ""
+    questions_json_str = re.sub(r'[^\x00-\x7F]+', '', questions_text)
 
     # Load the questions as JSON object from the text 
     questions_json = json.loads(questions_json_str)
