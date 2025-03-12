@@ -55,6 +55,9 @@ async def generate_questions(topic: str):
     # Challenge 1.c - Remove extra characters from response if present
     questions_json_str = re.sub(r'[^\x00-\x7F]+', '', questions_text)
 
+    # For model 08-13 use following regex
+    #questions_json_str = re.sub(r"^```json|```$", "", questions_text.strip())
+      
     # Load the questions as JSON object from the text 
     questions_json = json.loads(questions_json_str)
     # Return the questions as a JSON response
