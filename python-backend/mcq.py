@@ -98,17 +98,10 @@ async def generate_mcq(request: GenerateQuestionRequest):
     }
 
 # Change the call to client.beta.chat.completions.parse for Pydantic classes.
-    response = client.chat.completions.create(
+    response = client.beta.chat.completions.parse(
         model="gpt-4o-2024-08-06",
         temperature=0.5,
-        response_format={
-            "type": "json_schema",
-            "json_schema": {
-                "name": "multiple_choice_question",
-                "strict": True,
-                "schema": question_schema,
-            },
-        },
+        response_format=QuestionModel,
         messages=messages,
     )
 
