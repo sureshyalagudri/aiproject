@@ -36,7 +36,13 @@ OPENSEARCH_CONFIG = {
 INDEX_NAME = "files"
 
 def generate_embeddings(texts):
-    client = OpenAI()  # Get the OpenAI client
+    header_name = os.getenv('GATEWAY_HEADER_NAME')
+    header_value = os.getenv('GATEWAY_HEADER_VALUE')
+    headers = {
+        header_name: header_value
+    }
+    client = OpenAI(default_headers=headers)
+
     # Generate embeddings using OpenAI API
     response = client.embeddings.create(
         input=texts, dimensions=256, model="text-embedding-3-large"
@@ -70,9 +76,12 @@ def insert_documents(search_client, fileChunks, embeddings, fileMetadata):
 def retrieve_all_documents(client):
     # Perform the OpenSearch search to get ALL documents
     # query should as here: "query": {"match_all": {}},
-    search_body = {
-        
-    }
+    search_body = {        
+        "query": {
+            "match_all": {
+            }
+        }
+    } 
     response = client.search(index=INDEX_NAME, body=search_body)
     return response
 
@@ -84,7 +93,7 @@ async def get_files():
         client = OpenSearch(**OPENSEARCH_CONFIG)
         search_results = retrieve_all_documents(client)
         # Challenge2: Get hits (replace "" with relevant code) Note: Debug and find the object structure from search results.
-        hits = ""
+        hits = search_results["hits"]["hits"]
         # To get only distinct files
         sources = []  # List to hold file names
         for hit in hits:
