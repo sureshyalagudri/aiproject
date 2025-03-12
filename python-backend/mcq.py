@@ -15,11 +15,16 @@ headers = {
  }
 client = OpenAI(default_headers=headers)
 
-# class Option(BaseModel):
-   # Use this for Challenge 2
+class Option(BaseModel):
+    OptionIndex: int
+    OptionValue: str
 
-# class QuestionModel(BaseModel):
-    # Use this for Challenge 2
+class QuestionModel(BaseModel):
+    Id: str
+    Question: str
+    Options: List[Option]
+    CorrectOptionIndex: int
+    Complexity: str
 
 class GenerateQuestionRequest(BaseModel):
     topic: str
@@ -49,8 +54,47 @@ async def generate_mcq(request: GenerateQuestionRequest):
     user_message = {"role": "user", "content": [{"type": "text", "text": prompt}]}
     messages.append(user_message)
 
+
     question_schema = {
-        # Challenge1: Write the Schema for the multiple choice question as given in specification
+    "type": "object",
+    "properties": {
+        "Id": {
+            "type": "string",
+            "description": "The unique identifier for the question."
+        },
+        "Question": {
+            "type": "string",
+            "description": "The text of the multiple-choice question."
+        },
+        "Options": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "OptionIndex": {
+                        "type": "integer",
+                        "description": "The index of the option."
+                    },
+                    "OptionValue": {
+                        "type": "string",
+                        "description": "The text of the option."
+                    }
+                },
+                "required": ["OptionIndex", "OptionValue"],
+                "additionalProperties": False
+            }
+        },
+        "CorrectOptionIndex": {
+            "type": "integer",
+            "description": "The index of the correct option."
+        },
+        "Complexity": {
+            "type": "string",
+            "description": "The complexity level of the question."
+        }
+    },
+    "required": ["Id", "Question", "Options", "CorrectOptionIndex", "Complexity"],
+    "additionalProperties": False
     }
 
 # Change the call to client.beta.chat.completions.parse for Pydantic classes.
@@ -92,7 +136,7 @@ async def submit_mcq(request: Request):
     {user_message}"""
 
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-2024-08-06",
         temperature=0.2,
         messages=[
             {
