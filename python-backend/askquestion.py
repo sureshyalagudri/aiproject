@@ -48,9 +48,12 @@ async def submit_descriptive_questions(request: Request):
     
     #Challenge 2.a - Write Prompt to evaluate the question and answer
     #Use question and answer variable to generate the prompt
-    prompt = f""" 
-    
-                      """
+    prompt = f"""
+    You are an expert. Please evaluate the following question and answer.
+    Question: {question}
+    Answer: {answer}
+    Provide feedback along with rating between 1 and 10.
+    """
 
     # OpenAI Call to generate feedback
     header_name = os.getenv('GATEWAY_HEADER_NAME')
@@ -61,7 +64,11 @@ async def submit_descriptive_questions(request: Request):
     client = OpenAI(default_headers=headers)
 
     #Challenge 2.b - Call the OpenAI API and get the resopnse
-    response = {}
+    messages = [{"role": "user", "content": prompt}]
+    response = client.chat.completions.create(
+        model="gpt-4o-2024-08-06",
+        messages=messages,
+    )
 
     # Extract the generated text
     feedback_text = response.choices[0].message.content
