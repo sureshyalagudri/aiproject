@@ -71,10 +71,17 @@ async def submit_descriptive_questions(request: Request):
 
     # Challenge 2.a - Write prompt to evaluate the question and answer
     prompt = f"""
-                        """
+    You are an expert. Please evaluate the following questions and answers.
+    {user_message}
+    Provide feedback for each question and answer.
+    Also, provide an overall rating between 1 and 10.
+    """
 
     # Challenge 2.b - Call the OpenAI API and get the response
-    feedback_response = {}
+    feedback_response = client.chat.completions.create(
+        model="gpt-4o-2024-05-13",
+        messages=[{"role": "user", "content": prompt}]
+    )
 
     # Extract the generated text
     feedback_text = feedback_response.choices[0].message.content
